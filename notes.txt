@@ -1,0 +1,319 @@
+
+Application properties
+//logging.level.org.springframework = debug
+
+
+
+lecture 16:
+steps 11 to 26
+
+Different kind of applcation context
+
+Autowiring in depth
+
+when we have two or beans to resolve
+1) Autowire By name : just name the variable as per the class name. (this is prefered when we have more then 2 matching beans)
+2) @Primary annotation:  if we use both by name and primary annotation, the primary will have higher priority to get  the bean. (consider example of sortings)
+3) @Qualifier: for multiple candidates , user @Qualifier("SomeName") on both the interface instance as well as the class instance instance which we
+              want to call. ex: @Qualifier("quick") on QuicksortClass  as well as on sortalgorith instance variable we have created
+
+Among the above threee we prefer @primary then by autowire by name
+
+
+BEAN SCOPE:
+1) singletondefault is singleton which means we will get always a same bean even if we call multiple times
+2) Prototype: new bean whenever is requested
+3) request: one bean per http request
+3) session: one bean per http session
+
+use the annotation @Scope("Bean scope type") i.e  @Scope((ConfigurableBeanFactory.SCOPE_SINGLETON))
+
+
+#Complex Scenario
+
+bean is signleton type but the dependecy is of scope prototype
+ex:
+@Component
+@Scope((ConfigurableBeanFactory.SCOPE_SINGLETON))
+BinarySearchImp
+
+@Component
+@Scope((ConfigurableBeanFactory.SCOPE_PROTOYPE))
+QuickSortclass
+
+even the dependency is of scope prototype , if the main bean is of type singleton then it will return th based on singleton
+only, it will negate the scope what dependecy has. so to resolve this problem/someting we want then we use proxy.
+we want ot create the number of object as less as possible it create stress on the memory.
+
+lec 22:
+Spring singleton vs Gang of Four singleton
+
+GOF --> one singleton per JVM
+spring --> one singleton per application context
+
+lec 23: Component Scan
+whenever the application and the other components are not in the same package we use the annotation @componentScam("package dir")
+
+lec 24: Life Cycle of  bean
+@Component , the life cycle of a bean is mantained by the spring container
+
+when we want to manually to create beans instea dof autowired. #Postconstruct
+
+@PostConstruct
+this method is called before even any bean is formed
+
+@PreDestroy
+just before the bean is destroyed what you want to do
+
+
+lec 25
+
+context and dependency injection
+CDI, defined the dependency injection standard
+@Inject | @Autowired
+@Named | @component , @Qaulifier
+@SIgnleton | defines the scope fo the singleton
+
+before we can yuse CDI we need to add to pom.xml
+
+<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+CDI do nothing buit defining the few annotations
+
+create new package as CDI
+one dao layer class and some business layer class and laso create a new application
+
+you can use CDI or sping annotations, its upto you
+
+-->>lecture 27, how to use spring withour spring boot (basically spring core)
+
+remove spring boot starter and add spring core and spring conext and slf4j in pom.xml
+
+remove the @SPintgApplicationContext annotation and you need to define the following for configuration and component scan
+
+@Configuration
+@ComponentScan
+ on the aplpication class
+
+also the way we define will also change i.e use ACAC--> applicationconfigapplicationcontext, crea new instance with pass in application class
+
+so far nbasic config and application context and others are XML context
+ALso close the application context in spring core
+
+for any error related to dependency see if all the dependecies are addedproperly are not
+
+all the spring 5  things had to be wired manually by defining the application context xml files
+used to name tag and property with reference
+
+to load we use classpathxmlapplicationcontext in which we need t mentioned the name of the xml file
+
+lectuew 30/ step 23
+mix of java and xml context
+LOADING ALL THE BEANS, i.e the basic, DCI, xml etc
+get a componentscan configured on all the packages
+
+lecture 31 / step 24
+IoC container vs application context vs Bean Factory
+
+IoC container--> shiftinfg the responsibility of creating the beans to spring, the spring framework is responsible to create the beans
+                the container manages the beans
+
+application context and bean factory are the implementation of IoC container
+1) Bean  factory:  its provides the basic functionality, use it when the memory is an issue, like IoT devices
+
+2) Applicationcontext 99 percent used, it provied a  lot features ,its like internationalisation, provide
+
+lect 33/ step 25
+
+@Component: Generic component
+@repository: encapsulating storage ,retreival and search behavior typically from a Relational DB
+@Service: Business service facade
+@Controller : controller in MVC pattern
+
+
+for DAo use @Repository
+for business layer like algo classes use @Service
+there would be no change in the functionality then why we use specific annotation, ans: spring provides different functionality
+and its good to specify
+
+lecture 34| step 26
+
+read from external properties
+
+some values are read from proerty values, use annotation @Values
+
+@Value("${name of the value}") i.e external.service.url
+
+you also need to configure the property file in applciation class or wherever you are using the file. use the following annotation
+
+@PropertySource("classpath:name.properties")
+
+Sextion 5:
+lecture 35:
+step 1
+@Test
+@Before like database connection test etc
+@After
+beforeclass and afterclass
+
+Section 6 Mockito:
+can refer the github if needed
+you can mock the interface and classes to return the specific values
+you can also use some mock annotations
+
+@Mock
+@Inject we use on the instance where we need to inject the mocked object.
+whenever using mock annotaitons use runner
+use the floowing annotation on the class
+@RunWith(mockitoJunitRunner.class)
+
+for python we need to use some sort of mockedObjects
+mockito.any method
+
+section 7
+Spring Unit test
+
+1) Using Java context
+
+create a smilar package and test class in the packages to test the corresponding cases
+
+use the following annotation on the test class
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes=Name of the application context.class)
+
+ex:
+
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes=SpringProjectExternalPropertiesApplication.class)
+
+then use autowired to get the instances
+
+then use the mockito as follows:
+
+
+use the following annotaiton on the test class
+@RunWith(MockitoJunitRunner.class)
+
+use @Mock and @Inject
+use Mockito.when(instance.method).thenReturn(mention the value)
+
+
+
+
+SECTION 8, spring leve;4
+in 10 steps
+
+IMPORTANT SECTION
+
+spring boot actuators, for monitoring the features are built in
+SB provide different profiles
+spring boot is jnot a code generator, not a web server not aapplication server
+
+without spriong boot, we need to define a lot of things , SB provide all the infrastructure
+
+@RestController: use annotaion on the class where you want to define the controller i.e the url path and the functions you
+want to call
+
+@GetMapping("url patter")  call this value on the method which will be invoked after the url
+
+lewcture 59:
+understanding in depth
+
+@SpringBootApplication
+
+this annotation enables the component scan
+@RequestController is also compoenent
+
+AUTOCONFIGURATION
+
+what  is happening in the background
+spring boot looks art the frameworks available on the clas path
+existing configuration for application
+
+print out all the beans through application context you will
+look into the detail later ----------------------------- <<<<<<<>>>>>>>>>>>>
+
+view resolver, jacksoin, servelet dispatcher
+its a very very important concept  look into detail,,... One of the fundamental thing why spring boot is so famous
+
+Where is the code for autoconfiguration
+
+SPring vs SPring MVC vs SPring Boot
+
+Spring-->> all about defining dependencies, component, resolves the problem of dependency injection. ALso resolved duplication,
+Spring MVC-->> mainly concerned with the web application i.e sipatcher servelet, view resolver,
+Springboot-->> takes away the pain of configuration, it looks for what we have added, it will add the basic automatic configuration,
+spring boot also provides monitoring
+
+look into spring boot starter projects
+1) spring boot-starter-web-service, web-restful,jdbc,test,hateaos,data security etc...
+
+you can in general look at the sprin gboot starter sproject , like for an internview or as the usage comes
+
+added these two dependencies
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-rest-hal-browser</artifactId>
+			<version>3.3.9.RELEASE</version>
+
+in application.properties
+management.endpoints.web.exposure.include=*
+
+spring boot developer tools dependency
+
+
+Section 9
+
+Spring AOP
+Apect Oriented Programming
+AOP vd AspectJ
+AOP: logging and security is not common to layer,
+AOP is for cross cutting layers.
+
+2 business 2 Dao
+intersect the calls
+business in business package
+Dao in data package
+
+in Spring Applicatiopn class implements CommandLineRunner -->> implement the run method
+
+and autowired the business calls
+
+create a BeforeAspect class with @Aspect and @configuration annotation
+
+on before method
+@Before("* Package.*.*(..))")
+things executed before the actual execution of the method
+ex: we can check the user access then allowed the execution
+check for all the business layer
+
+use JointPoint
+Package-->> in above for @Before, it will internect all the methods in that package.  I guess
+Apect is a combination of jointPoint and advice,
+the logger info in the before method is called advice
+--->>>Weaving(process of AOp) and Weaver(frame work for AOP), come to this again when needed
+
+After Aspect
+@AfterReturning(value="", returning="")
+Genenrally to interecpt the expections that are thrown
+
+@After
+
+3) @Around
+to check the time of execution of the method
+we can do something before the execution, after th execution, it is more flexible then before / after
+
+
+Look at the AOP again if you will be implementing in the project for the priority is the JDBC / MVC
+
+Section 10:
+
+Interaction with the database
